@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react"
 import images from "../assets/images"
 const mockUsers = [
   {
@@ -21,10 +22,34 @@ const mockUsers = [
 ]
 
 const SideBar = ({ selectedUser, setSelectedUser }) => {
+  const menuRef = useRef(null)
+  const [showMenu, setShowMenu] = useState(false)
   return (
     <div className="bg-gray-800 text-white p-4">
       <h2 className="text-xl font-bold mb-4 flex items-center">
-        <img src={images.icon} className="rounded-full w-10 h-10 p-2"/> Chats</h2>
+        <img src={images.icon} className="rounded-full w-10 h-10 p-2"/> Chat
+      </h2>
+      <div className="relative" ref={menuRef}>
+        <img
+          src={images.menu}
+          alt="menu"
+          onClick={() => setShowMenu(prev => !prev)}
+          className="w-5 h-5 opacity-80 hover:opacity-100 cursor-pointer"
+        />
+
+        {showMenu && (
+          <div className="absolute right-0 mt-2 w-32 bg-gray-700 rounded-lg shadow-lg">
+            <div
+              className="px-4 py-2 hover:bg-gray-600 cursor-pointer rounded-t-lg">
+              Edit
+            </div>
+            <div
+              className="px-4 py-2 hover:bg-gray-600 cursor-pointer rounded-b-lg">
+              Logout
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="space-y-2">
         {mockUsers.map(user => (

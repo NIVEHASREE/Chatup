@@ -21,7 +21,6 @@ function Login() {
 
       <div className="relative z-10 grid md:grid-cols-[3fr_1.5fr] h-full px-[5%] py-[5%]">
         <div className='pt-10'>
-          <h1 className='text-white font-extrabold text-5xl py-2'>Let's</h1>
           <h1 className='text-white font-extrabold text-5xl py-2'>Connect With </h1>
           <h1 className='text-white font-extrabold text-5xl py-2'>Your Friends...</h1>
         </div>
