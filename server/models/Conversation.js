@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 const ConversationSchema = new mongoose.Schema({
-    members: {
-        type: Array,
-        required: true
-    },
+    members: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+    ],
     isgroup: {
         type: Boolean,
         default: false
@@ -12,9 +15,10 @@ const ConversationSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    lastMessage: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+        default: null
     }
-})
+}, {timestamps: true})
 module.exports = mongoose.model('Conversation', ConversationSchema)
