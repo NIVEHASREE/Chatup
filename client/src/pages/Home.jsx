@@ -4,7 +4,8 @@ import ChatContainer from '../components/ChatContainer'
 import RightSizeBar from '../components/RightSizeBar'
 
 const Home = () => {
-  const [selectedUser, setSelectedUser] = useState(null)
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
 
   return (
     <div className="bg-gray-900 w-full h-screen sm:px-[5%] sm:py-[5%]">

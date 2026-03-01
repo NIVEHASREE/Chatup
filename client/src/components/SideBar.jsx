@@ -1,27 +1,68 @@
 import { useState, useRef, useEffect } from "react"
 import images from "../assets/images"
-const mockUsers = [
+const mockConversations = [
   {
-    id: 1,
-    name: 'Alex',
-    lastMessage: 'Hey 👋',
+    _id: "conv1",
+    isgroup: false,
+    members: [
+      { _id: "currentUserId" }, 
+      {
+        _id: "u1",
+        username: "Alex",
+        profilePicture: images.alex,
+        isOnline: true
+      }
+    ],
+    lastMessage: {
+      text: "Hey 👋",
+      senderId: "u1",
+      seen: false,
+      createdAt: "2026-02-26T10:00:00Z"
+    },
     unread: 3
   },
   {
-    id: 2,
-    name: 'Priya',
-    lastMessage: 'See you tomorrow',
+    _id: "conv2",
+    isgroup: false,
+    members: [
+      { _id: "currentUserId" }, 
+      {
+        _id: "u2",
+        username: "Priya",
+        profilePicture: images.priya,
+        isOnline: false
+      }
+    ],
+    lastMessage: {
+      text: "See you tomorrow",
+      senderId: "u2",
+      seen: true,
+      createdAt: "2026-02-26T09:30:00Z"
+    },
     unread: 0
-  },
-  {
-    id: 3,
-    name: 'John',
-    lastMessage: 'Send the file',
-    unread: 1
+  },{
+    _id: "conv3",
+    isgroup: false,
+    members: [
+      { _id: "currentUserId" }, 
+      {
+        _id: "u3",
+        username: "John",
+        profilePicture: images.john,
+        isOnline: false
+      }
+    ],
+    lastMessage: {
+      text: "Share me the file",
+      senderId: "u3",
+      seen: true,
+      createdAt: "2026-02-26T09:30:00Z"
+    },
+    unread: 2
   }
 ]
 
-const SideBar = ({ selectedUser, setSelectedUser }) => {
+const SideBar = ({ selectedUser, setSelectedUser, setConversationId }) => {
   const menuRef = useRef(null)
   const [showMenu, setShowMenu] = useState(false)
   return (
@@ -34,7 +75,7 @@ const SideBar = ({ selectedUser, setSelectedUser }) => {
           src={images.menu}
           alt="menu"
           onClick={() => setShowMenu(prev => !prev)}
-          className="w-5 h-5 opacity-80 hover:opacity-100 cursor-pointer"
+          className="w-8 h-8 hover:opacity-80 cursor-pointer"
         />
 
         {showMenu && (
@@ -52,21 +93,30 @@ const SideBar = ({ selectedUser, setSelectedUser }) => {
       </div>
 
       <div className="space-y-2">
-        {mockUsers.map(user => (
-          <div
-            key={user.id}
-            onClick={() => setSelectedUser(user)}
-            className={`flex justify-between items-center p-3 rounded-lg cursor-pointer
+        {mockConversations.map(user => 
+          {
+          const otherUser = user.members.find(m => m._id !== "currentUserId");
+          return (
+            <div
+              key={user._id}
+              onClick={() => {
+                setSelectedUser(otherUser)
+                setConversationId(user._id)
+              }}
+              className={`flex items-center p-3 rounded-lg cursor-pointer
               ${
-                selectedUser?.id === user.id
+                selectedUser?._id === otherUser._id
                   ? 'bg-gray-700'
                   : 'hover:bg-gray-700'
               }`}
           >
+            
+            <img src={otherUser.profilePicture} alt="user" className="w-10 h-10 rounded-full mr-3"/>
+
             <div className="overflow-hidden">
-              <p className="font-semibold">{user.name}</p>
+              <p className="font-semibold">{otherUser.username}</p>
               <p className="text-sm opacity-60 truncate w-40">
-                {user.lastMessage}
+                {user.lastMessage.text}
               </p>
             </div>
 
@@ -76,7 +126,8 @@ const SideBar = ({ selectedUser, setSelectedUser }) => {
               </span>
             )}
           </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
