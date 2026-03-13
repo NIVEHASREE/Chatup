@@ -1,16 +1,50 @@
 import React, { useState } from 'react'
 import images from '../assets/images'
 import {useNavigate} from 'react-router-dom';
+import api from '../api/axios';
+
 
 function Login() {
   const[currState,setCurrState]=useState("Sign up")
-  const[name,setName]=useState("");
+  const[username,setName]=useState("");
   const[email,setEmail] =useState("");
   const[password,setPassword]=useState("");
-  const[bio,setBio]=useState("");
+  const[about,setabout]=useState("");
   const[submittedData,setSubmittedData]=useState(false);
   const navigate = useNavigate();
 
+  const signupHandler= async (e)=>{
+    e.preventDefault();
+    try{
+      if(currState==="Sign up" && !submittedData){
+        setSubmittedData(true);
+        return;
+      }
+      if(currState==="Sign up" && submittedData){
+        const userData={
+          username,email,password,about
+        }
+        const res = await api.post("/auth/signup",userData);
+        alert(res.data.message);
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("currentUserId", res.data.user._id);
+        navigate("/");
+      }
+      else if(currState==="Login"){
+        const userData={
+          email,password
+        }
+        const res = await api.post("/auth/login",userData);
+        alert(res.data.message);
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("currentUserId", res.data.user._id);
+        navigate("/");
+      }
+      
+    }catch(error){
+      alert(error.response.data.message || "Something went wrong");
+    }
+  }
   return (
     <div className="relative w-full h-screen overflow-hidden">
       <img
@@ -43,6 +77,8 @@ function Login() {
               type="text"
               placeholder="Enter name" required
               className="p-3 rounded-xl bg-white/20 text-white placeholder-gray-300 outline-none"
+              value={username}
+              onChange={(e)=>setName(e.target.value)}
             />
             )}
             
@@ -53,12 +89,16 @@ function Login() {
                 type="email"
                 placeholder="Enter email" required
                 className="p-3 rounded-xl bg-white/20 text-white placeholder-gray-300 outline-none"
+                value={email}
+                onChange={(e)=>setEmail(e.target.value)}
                 />
 
                 <input
                   type="password" required
                   placeholder="Enter password"
                   className="p-3 rounded-xl bg-white/20 text-white placeholder-gray-300 outline-none"
+                  value={password}
+                  onChange={(e)=>setPassword(e.target.value)}
                 />
               </>
             )}
@@ -67,12 +107,14 @@ function Login() {
               <textarea rows={4} 
               className="p-3 rounded-xl bg-white/20 text-white placeholder-gray-300 outline-none"
               placeholder='Enter bio'
+              value={about}
+              onChange={(e)=>setabout(e.target.value)}
               />
             )}
 
             <button type='submit' 
             className='py-3 bg-linear-to-r from-cyan-600 to-sky-700 text-white p-3 rounded-2xl'
-            onClick={()=>{navigate('/')}}>
+            onClick={signupHandler}>
               {currState=== "Sign up"?"Create account":"Login"}
             </button>
 

@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react"
 import images from "../assets/images"
-const mockConversations = [
+import api from "../api/axios";
+import { getChats } from "../services/api";
+{/*const mockConversations = [
   {
     _id: "conv1",
     isgroup: false,
@@ -10,7 +12,8 @@ const mockConversations = [
         _id: "u1",
         username: "Alex",
         profilePicture: images.alex,
-        isOnline: true
+        isOnline: true,
+        about:"Hello there! Im using ChatApp."
       }
     ],
     lastMessage: {
@@ -19,7 +22,12 @@ const mockConversations = [
       seen: false,
       createdAt: "2026-02-26T10:00:00Z"
     },
-    unread: 3
+    unreadCounts: [
+      {
+        userId: "currentUserId",
+        count: 3
+      }
+    ]
   },
   {
     _id: "conv2",
@@ -30,7 +38,8 @@ const mockConversations = [
         _id: "u2",
         username: "Priya",
         profilePicture: images.priya,
-        isOnline: false
+        isOnline: false,
+        about:"Hello there! Im using ChatApp."
       }
     ],
     lastMessage: {
@@ -39,7 +48,12 @@ const mockConversations = [
       seen: true,
       createdAt: "2026-02-26T09:30:00Z"
     },
-    unread: 0
+    unreadCounts: [
+      {
+        userId: "currentUserId",
+        count: 0
+      }
+    ]
   },{
     _id: "conv3",
     isgroup: false,
@@ -49,22 +63,77 @@ const mockConversations = [
         _id: "u3",
         username: "John",
         profilePicture: images.john,
-        isOnline: false
+        isOnline: false,
+        about:"Hello there! Im using ChatApp."
       }
     ],
     lastMessage: {
       text: "Share me the file",
       senderId: "u3",
       seen: true,
-      createdAt: "2026-02-26T09:30:00Z"
+      createdAt: "2026-03-01T09:30:00Z"
     },
-    unread: 2
+    unreadCounts: [
+      {
+        userId: "currentUserId",
+        count: 2
+      }
+    ]
   }
 ]
-
+*/}
 const SideBar = ({ selectedUser, setSelectedUser, setConversationId }) => {
   const menuRef = useRef(null)
   const [showMenu, setShowMenu] = useState(false)
+  const [conversations, setConversations] = useState([]);
+
+  const token = localStorage.getItem("token");
+  const currentUserId = localStorage.getItem("currentUserId");
+
+  const formatMessageTime = (dateString) => {
+    const messageDate = new Date(dateString);
+    const now = new Date();
+
+    const isToday =
+      messageDate.getDate() === now.getDate() &&
+      messageDate.getMonth() === now.getMonth() &&
+      messageDate.getFullYear() === now.getFullYear();
+
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
+
+    const isYesterday =
+      messageDate.getDate() === yesterday.getDate() &&
+      messageDate.getMonth() === yesterday.getMonth() &&
+      messageDate.getFullYear() === yesterday.getFullYear();
+
+    if (isToday) {
+      return messageDate.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    if (isYesterday) {
+      return "Yesterday";
+    }
+
+    return messageDate.toLocaleDateString();
+  };
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const chats = await getChats(token);
+        console.log(chats);
+        setConversations(chats);
+      } catch (error) {
+        console.error("Error fetching chats:", error);
+      }
+    };
+    fetchChats();
+  }, []);
+
   return (
     <div className="bg-gray-800 text-white p-4">
       <h2 className="text-xl font-bold mb-4 flex items-center">
@@ -93,9 +162,15 @@ const SideBar = ({ selectedUser, setSelectedUser, setConversationId }) => {
       </div>
 
       <div className="space-y-2">
-        {mockConversations.map(user => 
+        {Array.isArray(conversations) && conversations.map(user => 
           {
-          const otherUser = user.members.find(m => m._id !== "currentUserId");
+            
+          const otherUser = user.members.find(m => m._id !== currentUserId);
+          if (!otherUser) return null;
+          const currentUserUnread = user.unreadCounts?.find(
+            u => u.userId === currentUserId
+          )?.count || 0;
+
           return (
             <div
               key={user._id}
@@ -116,15 +191,19 @@ const SideBar = ({ selectedUser, setSelectedUser, setConversationId }) => {
             <div className="overflow-hidden">
               <p className="font-semibold">{otherUser.username}</p>
               <p className="text-sm opacity-60 truncate w-40">
-                {user.lastMessage.text}
+                {user.lastMessage?.text || "No messages yet"}
               </p>
             </div>
 
-            {user.unread > 0 && (
-              <span className="bg-cyan-500 text-xs px-2 py-1 rounded-full">
-                {user.unread}
-              </span>
-            )}
+            <div>
+              {currentUserUnread > 0 && (
+                <span className="bg-cyan-500 text-xs px-2 py-1 rounded-full">
+                  {currentUserUnread}
+                </span>
+              )}
+              <p className="text-sm opacity-60 truncate w-40">{user.lastMessage ? formatMessageTime(user.lastMessage.createdAt) : ""}</p>
+            </div>
+
           </div>
           )
         })}

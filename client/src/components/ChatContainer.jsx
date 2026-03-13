@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import images from "../assets/images"
 const mockConversations = [
   {
@@ -43,6 +43,23 @@ const mockConversations = [
   },
 ]
 const ChatContainer = ({ selectedUser, conversationId }) => {
+  const [messages, setMessages] = useState(mockConversations);
+  const [currMessage,setCurrMessage]=useState("");
+  const sendMessage= (message)=>{
+    if(message.trim()===""){
+      return;
+    }
+    const newMessage = {
+      _id: Date.now().toString(),
+      conversationId: conversationId,
+      text: message,
+      senderId: "currentUserId",
+      seen: false,
+      createdAt: new Date().toISOString()
+    }
+    messages.push(newMessage);
+    setCurrMessage("");
+  }
   if (!selectedUser) {
     return (
       <div className="flex items-center justify-center text-white opacity-50">
@@ -58,7 +75,7 @@ const ChatContainer = ({ selectedUser, conversationId }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {mockConversations.map(msg=>{
+        {messages.map(msg=>{
           return(
               <div key={msg._id} className={`flex ${msg.senderId === "currentUserId" ? "justify-end" : "justify-start"}`}>
                 <p className="bg-gray-700 max-w-xs p-2 rounded-lg text-white">{msg.text}</p>
@@ -72,10 +89,16 @@ const ChatContainer = ({ selectedUser, conversationId }) => {
           type="text"
           placeholder="Type a message..."
           className="w-full p-3 rounded-xl bg-gray-800 outline-none"
+          onChange={(e)=>setCurrMessage(e.target.value)}
+          value={currMessage}
         />
-        <img src={images.send} className="w-10 h-10 cursor-pointer"/>
+        <img src={images.send} 
+          className="w-10 h-10 cursor-pointer"
+          onClick={()=>{
+            sendMessage(currMessage);
+          }}
+        />
       </div>
-
     </div>
   )
 }
