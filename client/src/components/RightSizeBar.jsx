@@ -10,6 +10,7 @@ const RightSizeBar = ({ selectedUser }) => {
         <img src={selectedUser.profilePicture} className="w-16 h-16 rounded-full mb-2"/>
         <p className="font-semibold">{selectedUser.username}</p>
         <p className={selectedUser.isOnline ? "text-sm text-green-400" : "text-sm text-red-400"}>{selectedUser.isOnline ? "Online" : "Offline"}</p>
+        <p className="text-sm">{selectedUser.about}</p>
       </div>
 
       <div className="mt-6">

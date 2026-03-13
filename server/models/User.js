@@ -18,6 +18,10 @@ const UserSchema=new mongoose.Schema({
         type:String,
         default:""
     },
+    about:{
+        type:String,
+        default:"Hello there! Im using ChatApp."
+    },
     isOnline:{
         type:Boolean,
         default:false
